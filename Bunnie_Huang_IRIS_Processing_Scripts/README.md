@@ -37,8 +37,6 @@ These scripts implement several stages of the data-curation portion of the pipel
 
 ## Folder Contents
 
-> *(Fill in file names / short descriptions here once the folder contents are finalized. Suggested format below.)*
-
 ```
 bunnie_scripts/
 ├── <GDS_to_PNG>.py               # Converts poly-layer GDS files of each functional block into rasterized blueprint images.
