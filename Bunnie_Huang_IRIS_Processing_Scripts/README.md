@@ -43,9 +43,9 @@ These scripts implement several stages of the data-curation portion of the pipel
 bunnie_scripts/
 ├── <GDS_to_PNG>.py               # Converts poly-layer GDS files of each functional block into rasterized blueprint images.
 ├── <extract_dataset_cell>.py     # Applies Fourier–Mellin Transform to align physical IRIS crops with their corresponding GDS blueprint images, followed by cell extraction.
-├── <techbase>.py                 # Forms the technology parent class base of ASIC chips. 
-├── <sky130>.py                   # Adds technology spectifications for SKY130A PDK.
-└── <schema>.py                   # 
+├── <techbase>.py                 # Base class TechBase providing a common interface for any PDK. 
+├── <sky130>.py                   # SKY130A PDK-specific subclass of TechBase.
+└── <schema>.py                   # Defines the Schema class, which parses LEF (Library Exchange Format) files from the PDK to build a JSON database (db.json) of standard-cell macros.
 ```
 
 ---
