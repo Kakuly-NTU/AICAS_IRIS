@@ -18,9 +18,9 @@ The scripts contained in this folder originate from the following public reposit
 Related resources:
 
 - **IRIS technique (arXiv paper):** A. "bunnie" Huang, *"Infra-Red, In-Situ (IRIS) Inspection of Silicon,"* arXiv:2303.07406, Mar. 2023. https://arxiv.org/abs/2303.07406
-- **bunnie's IRIS blog category:** https://www.bunniestudios.com/blog/category/iris/
+- ** Bunnie's IRIS blog category:** https://www.bunniestudios.com/blog/category/iris/
 
-If you use any of these scripts, **please cite bunnie's original work** in addition to our paper.
+If you use any of these scripts, **please cite Bunnie's original work** in addition to our paper.
 
 ---
 
@@ -41,9 +41,11 @@ These scripts implement several stages of the data-curation portion of the pipel
 
 ```
 bunnie_scripts/
-├── <script_1>.py     # Brief description
-├── <script_2>.py     # Brief description
-└── ...
+├── <GDS_to_PNG>.py               # Converts poly-layer GDS files of each functional block into rasterized blueprint images.
+├── <extract_dataset_cell>.py     # Applies Fourier–Mellin Transform to align physical IRIS crops with their corresponding GDS blueprint images, followed by cell extraction.
+├── <techbase>.py                 # Forms the technology parent class base of ASIC chips. 
+├── <sky130>.py                   # Adds technology spectifications for SKY130A PDK.
+└── <schema>.py                   # 
 ```
 
 ---
@@ -87,7 +89,7 @@ Any modifications made in the context of our AICAS pipeline are noted at the top
 
 ## Citation
 
-If you use these scripts, please cite both bunnie's original IRIS work and our AICAS paper:
+If you use these scripts, please cite both Bunnie's original IRIS work and our AICAS paper:
 
 **IRIS (original technique):**
 ```bibtex
@@ -103,7 +105,7 @@ If you use these scripts, please cite both bunnie's original IRIS work and our A
 ```
 
 **Our AICAS paper:**
-Citation will be provided once the proceedings are published in the conference!
+> *(Citation will be provided once the proceedings are published at the conference!)*
 
 ---
 
