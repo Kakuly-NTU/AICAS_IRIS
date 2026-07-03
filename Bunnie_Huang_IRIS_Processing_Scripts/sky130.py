@@ -1,3 +1,12 @@
+"""
+sky130.py
+
+SKY130-specific technology adapter extending TechBase. It defines cell-type and
+cell-family lookup rules, hue/saturation mapping ranges for visualization, and
+name-based classification helpers used in labeling, statistics, and palette
+generation.
+"""
+
 import logging
 import re
 import pprint

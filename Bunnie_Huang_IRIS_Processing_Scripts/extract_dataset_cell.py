@@ -1,6 +1,17 @@
+"""
+extract_dataset_cell.py
+
+Aligns IRIS captures to GDS-derived blueprint images using Fourier-Mellin
+rotation/scale estimation and OpenCV template matching, then crops labeled
+cell regions to construct ML-ready dataset entries.
+
+The script reads alignment inputs and exported cell metadata, maps cells into
+reduced classes (ff/logic/fill), and assembles per-block sample structures for
+training/evaluation pipelines.
+"""
+
 import argparse
 import logging
-
 import cv2
 import numpy as np
 from numpy.fft import fft2, ifft2
@@ -10,9 +21,6 @@ import pickle
 import re
 from pathlib import Path
 import os
-# Derived from reference code generated as follows:
-#   Prompt: "give me an example implementation of using a fourier-mellin transform to correct for rotation and scale between two images"
-#   Model: ChatGPT 4o
 
 def log_polar_transform(image):
     center = (image.shape[1] // 2, image.shape[0] // 2)
@@ -155,7 +163,6 @@ if __name__ == "__main__":
 
     names = ["wb_bridge_2way", "wrapped_etpu", "wb_openram_wrapper", "wrapped_function_generator", "wrapped_ibnalhaytham", "wrapped_mbsFSK", "wrapped_silife", "wrapped_snn_network", "housekeeping"]
     #names = args.names
-    #names = ["wb_openram_wrapper"]
     max_location_json = {"functional_blocks": []}
     layer = args.layer
     tech = args.tech
@@ -192,16 +199,8 @@ if __name__ == "__main__":
             image_snap = snap_to_max(image, max_dim)
             gds_label_image_snap = snap_to_max_rgb(gds_label_image, max_dim)
             max_location_entry['gds_png_shape'] = list(gds_png.shape)
-            #cv2.imshow("GDS Snap", gds_png_snap)
-            #cv2.waitKey(0)
-            #cv2.destroyAllWindows()
-
-            #cv2.imshow("Image Snap", image_snap) 
-            #cv2.waitKey(0)
-            #cv2.destroyAllWindows()
-    
-            # Find rotation and scale difference
             
+            # Find rotation and scale difference
             rotation_angle, scale_factor = find_rotation_and_scale(gds_png_snap, image_snap)
             print(f"Rotation angle: {rotation_angle}, Scale factor: {scale_factor}")
 
@@ -225,13 +224,13 @@ if __name__ == "__main__":
                 print("Max Location:", max_loc)
                 composite_overlay = np.zeros(corrected_image.shape, np.uint8)
                 composite_overlay[max_loc[1]:max_loc[1] + gds_png.shape[0], max_loc[0]: max_loc[0] + gds_png.shape[1]] = gds_png
-                #cv2.imwrite(f'imaging/dataset_extraction/{name}_{layer}_corrected_2.png', corrected_image)
+                cv2.imwrite(f'imaging/dataset_extraction/{name}_{layer}_corrected_2.png', corrected_image)
                 blended = cv2.addWeighted(corrected_image, 1.0, composite_overlay, 0.5, 0)
                 #cv2.imwrite(f'imaging/dataset_extraction/{name}_{layer}_blended_2.png', blended)
                 max_location_entry['max_location'] = max_loc
             
             else:
-                print("Corrected image is smaller than or approximately the same size than the image")
+                print("Corrected image is smaller than or approximately the same size than the GDS image")
                 corrected_image_corrected = correct_rotation_and_scale(image_snap, 0, scale_factor)
                 corr = cv2.matchTemplate(corrected_image_corrected, gds_png, cv2.TM_CCOEFF)
                 _min_val, _max_val, _min_loc, max_loc = cv2.minMaxLoc(corr)
@@ -239,21 +238,14 @@ if __name__ == "__main__":
                 print("Max Location:", max_loc)
                 composite_overlay = np.zeros(corrected_image_corrected.shape, np.uint8)
                 composite_overlay[max_loc[1]:max_loc[1] + gds_png.shape[0], max_loc[0]: max_loc[0] + gds_png.shape[1]] = gds_png
-                #cv2.imwrite(f'imaging/dataset_extraction/{name}_{layer}_corrected_2.png', corrected_image_corrected)
+                cv2.imwrite(f'imaging/dataset_extraction/{name}_{layer}_corrected_2.png', corrected_image_corrected)
                 blended = cv2.addWeighted(corrected_image_corrected, 1.0, composite_overlay, 0.5, 0)
-                #max_loc = (0, 0)
                 #print("Max Location:", max_loc)
                 #cv2.imwrite(f'imaging/dataset_extraction/{name}_{layer}_blended_2.png', blended)
                 max_location_entry['max_location'] = max_loc
 
             max_location_json['functional_blocks'].append(max_location_entry)
-            #composite_overlay = corrected_gds
-            #composite_overlay[max_loc[1]:max_loc[1] + gds_png.shape[0], max_loc[0]: max_loc[0] + gds_png.shape[1]] = gds_png
-            
-            
-            #cv2.imshow("Composite Overlay", composite_overlay)
-            #cv2.waitKey(0)
-            #cv2.destroyAllWindows()
+    
             
             if corrected_image.shape[0] >= gds_png.shape[0] and corrected_image.shape[1] >= gds_png.shape[1]:
                 corrected_image_rgb = cv2.cvtColor(corrected_image, cv2.COLOR_GRAY2BGR)
@@ -262,18 +254,12 @@ if __name__ == "__main__":
             else:
                 corrected_image_rgb = cv2.cvtColor(corrected_image_corrected, cv2.COLOR_GRAY2BGR)
                 label_overlay = np.zeros(corrected_image_rgb.shape, np.uint8)
-                #label_overlay = corrected_gds_label
                 label_overlay[max_loc[1]:max_loc[1] + gds_label_image.shape[0], max_loc[0]: max_loc[0] + gds_label_image.shape[1], :] = gds_label_image
                 corrected_image = corrected_image_corrected
             
-            #label_overlay = corrected_gds_label
-            #label_overlay[max_loc[1]:max_loc[1] + gds_label_image.shape[0], max_loc[0]: max_loc[0] + gds_label_image.shape[1], :] = gds_label_image
-            label_blended = cv2.addWeighted(corrected_image_rgb, 1.0, label_overlay, 0.3, 0)  
-            #cv2.imwrite(f'imaging/dataset_extraction/{name}_{layer}_aligned_2.png', label_blended)
             
-            #cv2.imshow("Label_Blended", label_blended)
-            #cv2.waitKey(0)
-            #cv2.destroyAllWindows()
+            label_blended = cv2.addWeighted(corrected_image_rgb, 1.0, label_overlay, 0.3, 0)  
+            
 
             with open(f'imaging/{args.tech}_cells.json', 'r') as f:
                 cell_names = json.load(f)
@@ -341,7 +327,7 @@ if __name__ == "__main__":
                             cv2.waitKey(0)
 
             # dump the data into pickle files for consumption by downstream CNN pipeline
-            '''print(f'max_x: {max_x}, max_y: {max_y}')
+            print(f'max_x: {max_x}, max_y: {max_y}')
             for i in range(len(reduced_types())):
                 print(f"{reduced_types()[i]}: {entry['labels'].count(i)}")
             with open(f'imaging/dataset_extraction/cell_dataset/{name}_{layer}{psi}_cell_1.pkl', 'wb') as f:
@@ -355,40 +341,6 @@ if __name__ == "__main__":
                 pickle.dump(meta, f)
 
             # Quality check the alignment
-            blended_rect = cv2.addWeighted(corrected_image_rgb, 1.0, cell_overlay, 1, 0)'''
+            blended_rect = cv2.addWeighted(corrected_image_rgb, 1.0, cell_overlay, 1, 0)
 
-            #cv2.imshow("Corrected Image", corrected_image)
-            #cv2.waitKey(0)
-            #cv2.destroyAllWindows()
-
-            #cv2.imshow("Cell Overlay", cell_overlay)
-            #cv2.waitKey(0)
-            #cv2.destroyAllWindows()
-
-            # Display the corrected image
-            # cv2.imshow("Corrected Image", corrected_img2)
-            # cv2.imshow("Reference image", img1)
-            #cv2.imshow("Correlation", cv2.normalize(corr, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U))
-            #cv2.waitKey(0)
-            #cv2.destroyAllWindows()
-
-            #cv2.imshow("Blended", blended)
-            #cv2.waitKey(0)
-            #cv2.destroyAllWindows()
-
-            #cv2.imshow("Rectangles", blended_rect)
-            #cv2.waitKey(0)
-            #cv2.destroyAllWindows()
-
-            # Now read in the JSON file with cell locations, and use this to create a training set of data
-            # This consists of:
-            #  - A monochrome rectangle that defines the region of interest; the color is correlated to the gate type
-            #  - The underlying source image, cropped to a fixed size that represents the maximum search window for a
-            #    gate of any size (equal to the biggest standard cell plus some alignment margin)
-            #  - The representation of the "true gate" as a black and white image, correlated to the source image
-            #
-            # The input to the classifier would be a source image area, that is the same as the fixed size used in training
-            # The output of the classifier is a tensor of potential gate matches, which we will threshold into "most likely match"
-
-    #with open('imaging/dataset_extraction/max_locations.json', 'w') as f:
-    #    json.dump(max_location_json, f)
+            

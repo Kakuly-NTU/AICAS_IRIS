@@ -1,3 +1,19 @@
+"""
+prims.py
+
+Defines lightweight geometry primitives used by layout-processing utilities:
+Point and Rect. Includes normalized rectangle handling, intersection and
+translation helpers, scaling/area operations, and coordinate comparison support
+with controlled rounding precision.
+""""""
+prims.py
+
+Defines lightweight geometry primitives used by layout-processing utilities:
+Point and Rect. Includes normalized rectangle handling, intersection and
+translation helpers, scaling/area operations, and coordinate comparison support
+with controlled rounding precision.
+"""
+
 # Number of decimal places to round coordinates to prior to
 # magnitude comparisons.
 ROUNDING = 5

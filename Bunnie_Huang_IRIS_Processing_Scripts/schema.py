@@ -1,3 +1,13 @@
+"""
+schema.py
+
+Defines the Schema utility for LEF database management. It scans LEF files to
+extract macro geometry/origin metadata, stores the parsed cell library in a
+structured schema, and reads/writes a cached db.json representation for reuse.
+
+Used by technology adapters to resolve standard-cell dimensions and metadata.
+"""
+
 import json
 from prims import Rect, Point, ROUNDING
 import logging
@@ -21,10 +31,6 @@ class Schema():
     def read(self):
         fullpath = self.path / Path('db.json')
         if not fullpath.is_file():
-            # For some reason the FileNotFoundError is not being propagated
-            # back to the caller, I'm having to do this weird thing. Probably
-            # some import has...changed the behaviors of exceptions in a way
-            # I don't expect and I don't know which one it was. Fucking Python.
             return False
         with open(self.path / Path('db.json'), 'r') as config:
             self.schema = json.loads(config.read())

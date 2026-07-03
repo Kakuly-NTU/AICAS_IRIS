@@ -1,3 +1,12 @@
+"""
+pallette.py
+
+Provides deterministic color-mapping utilities for standard cells, label maps,
+and functional regions. HashPallette assigns HSV/RGB colors by cell type/family,
+supports legend generation, and maintains lookup tables used by rendering and
+annotation export scripts.
+"""
+
 import numpy as np
 import cv2
 import logging

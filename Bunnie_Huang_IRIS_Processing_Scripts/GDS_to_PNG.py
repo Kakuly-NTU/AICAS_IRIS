@@ -1,10 +1,22 @@
+"""
+GDS_to_PNG.py
+
+Converts functional-block GDS layouts into raster blueprint images and exports
+cell-level annotation artifacts. The script renders layout polygons to PNG,
+builds cell bounding-box maps, and writes JSON metadata used downstream for
+alignment and dataset extraction.
+
+Primary outputs include:
+- imaging/gds_to_png_images/*.png
+- imaging/coloured_images/*.json, *.png
+- imaging/labelled_images/*.json, *.png
+"""
+
 import argparse
 import json
 import logging
 import importlib.util
 import progressbar
-
-
 import cv2
 import numpy as np
 from pathlib import Path
@@ -319,11 +331,11 @@ def export_one_class_label(cell_list, cell_type, interactive=False):
     progress.finish()
     
     cv2.imwrite(str(image_directory / ('Images_' + cell_type + '/' + gds_file.stem + '_' + cell_type + '.png')), image)
-    '''with open(str(image_directory / ('Images_' + cell_type + '/' + gds_file.stem + '_' + cell_type + '.json')), 'w') as f:
+    with open(str(image_directory / ('Images_' + cell_type + '/' + gds_file.stem + '_' + cell_type + '.json')), 'w') as f:
         json.dump(export, f)
 
     with open(str(image_directory / ('Images_' + cell_type + '/' + gds_file.stem + '_relative_' + cell_type + '.json')), 'w') as f:
-        json.dump(export_relative, f)'''
+        json.dump(export_relative, f)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="IRIS GDS to pixels helper")
@@ -343,7 +355,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "--redact", default=False, action="store_true", help="Redact details"
     )
-
+    image_directory = Path('imaging/')
     args = parser.parse_args()
     numeric_level = getattr(logging, args.loglevel.upper(), None)
     if not isinstance(numeric_level, int):
@@ -356,7 +368,7 @@ if __name__ == '__main__':
     tech_module_spec.loader.exec_module(tech_module)
     tm = tech_module.Tech(args)
 
-    image_directory = Path('imaging/')
+  
     # Export all the cells for use as labels later on
     with open(image_directory / f"{args.tech}_cells.json", 'w') as f:
         cell_list = list(tm.tech.schema['cells'].keys())
@@ -372,11 +384,11 @@ if __name__ == '__main__':
         # Catch it if it's not the case, so I can find the test case and understand what it even means to have two top cells.
         assert len(cells) == 1
 
-        '''if True:
+        if True:
             # Export the GDS as PNG files
             export_png(cells[0], interactive=args.interactive)
 
-        if True:
+        '''if True:
             # Export the GDS as abstract library tiles
             export_lib(cells[0], interactive=args.interactive)
         
@@ -386,10 +398,10 @@ if __name__ == '__main__':
 
         if True:
             # Export the GDS as logic map
-            export_logic_label(cells[0], interactive=args.interactive)'''
+            export_logic_label(cells[0], interactive=args.interactive)
 
         if True:
             # Export the GDS as one-class-per-image labels
             cell_types = ['ff', 'logic', 'fill']
             for cell_type in cell_types:
-                export_one_class_label(cells[0], cell_type, interactive=args.interactive)
+                export_one_class_label(cells[0], cell_type, interactive=args.interactive)'''

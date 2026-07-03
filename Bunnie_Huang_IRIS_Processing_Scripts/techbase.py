@@ -1,3 +1,12 @@
+"""
+techbase.py
+
+Implements the technology-agnostic base class used by PDK-specific adapters.
+TechBase initializes LEF schema access, manages palette integration, provides
+shared statistics collection over mapped cells, and exposes common helper
+methods for naming/redaction and reporting.
+"""
+
 import pprint
 import logging
 from pathlib import Path

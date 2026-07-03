@@ -43,6 +43,8 @@ Bunnie_Huang_IRIS_Processing_Scripts/
 ├── <extract_dataset_cell>.py     # Applies Fourier–Mellin Transform to align physical IRIS crops with their corresponding GDS blueprint images, followed by cell extraction.
 ├── <techbase>.py                 # Base class TechBase providing a common interface for any PDK. 
 ├── <sky130>.py                   # SKY130A PDK-specific subclass of TechBase.
+├── <palette>.py                  # HSV/RGB color-mapping utilities for cell/category visualization.
+├── <prims>.py                    # Geometry primitives (Point, Rect) and helper operations used by layout/schema utilities.
 └── <schema>.py                   # Defines the Schema class, which parses LEF (Library Exchange Format) files from the PDK to build a JSON database (db.json) of standard-cell macros.
 ```
 
