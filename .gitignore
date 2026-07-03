@@ -1,0 +1,4 @@
+# Local LEF/PDK databases (generated or proprietary)
+tech/
+Bunnie_Huang_IRIS_Processing_Scripts/tech/
+**/db.json
